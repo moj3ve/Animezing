@@ -1,0 +1,9 @@
+Package: me.memor1es.animezing
+Name: Animezing
+Depends: mobilesubstrate
+Version: 1.0
+Architecture: iphoneos-arm
+Description: You like Anime Sounds? Then this is the tweak for you!
+Maintainer: Memor1es
+Author: Memor1es
+Section: Tweaks
