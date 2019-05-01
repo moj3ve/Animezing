@@ -66,7 +66,7 @@
                 
         [player play];
 	
-    //if device get unplugged from charger play sound
+    //if device is not connected to charger or is getting uplugged from the charger play sound
 	} else if (self.isOnAC == false) {
 
         player = [[AVAudioPlayer alloc] initWithContentsOfURL:unpluggedURL error:nil];
