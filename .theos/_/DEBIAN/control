@@ -1,7 +1,6 @@
 Package: me.shymemoriees.animezing
 Name: Animezing
 Depends: mobilesubstrate
-Version: 1.2
 Architecture: iphoneos-arm
 Description: Your device will be able to play anime voice/sound effects
 Maintainer: ShyMemoriees
@@ -10,3 +9,5 @@ Section: Tweaks
 SileoDepiction: https://repo.memor1es.me/depicitions/aezg/index.html
 Depiction: https://repo.memor1es.me/depicitions/aezg/index.html
 Icon: https://repo.memor1es.me/depicitions/aezg/assets/icon.png
+Version: 1.2-3+debug
+Installed-Size: 416

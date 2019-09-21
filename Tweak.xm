@@ -1,114 +1,95 @@
-//import AVFoundation and AudioServices for the Audio Player
-#import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioServices.h>
 
         @interface SBUIController : NSObject {
 	
         }
-            //declare needed variables
-            +(id)sharedInstance;
+
             -(BOOL)isOnAC;
-            -(BOOL)isFullyCharged;
-            -(BOOL)isBatteryCharging;
+
         @end
 
 
-        //Audio Player variable
-        AVAudioPlayer *player;
-
-
-        //Sound paths
-        NSString *startUpPath = [[NSBundle bundleWithPath:@"/Library/Application Support/Animezing/"] pathForResource:@"startUp" ofType:@"caf"];
-    	NSURL *startUpURL = [[NSURL alloc] initFileURLWithPath:startUpPath];
-
-        NSString *chargingPath = [[NSBundle bundleWithPath:@"/Library/Application Support/Animezing/"] pathForResource:@"charging" ofType:@"caf"];
-    	NSURL *chargingURL = [[NSURL alloc] initFileURLWithPath:chargingPath];
-
-        NSString *unpluggedPath = [[NSBundle bundleWithPath:@"/Library/Application Support/Animezing/"] pathForResource:@"unplugged" ofType:@"caf"];
-    	NSURL *unpluggedURL = [[NSURL alloc] initFileURLWithPath:unpluggedPath];
-
-        NSString *fullyChargedPath = [[NSBundle bundleWithPath:@"/Library/Application Support/Animezing/"] pathForResource:@"fullyCharged" ofType:@"caf"];
-    	NSURL *fullyChargedURL = [[NSURL alloc] initFileURLWithPath:fullyChargedPath];
-
-        NSString *appKilledPath = [[NSBundle bundleWithPath:@"/Library/Application Support/Animezing/"] pathForResource:@"appKilled" ofType:@"caf"];
-    	NSURL *appKilledURL = [[NSURL alloc] initFileURLWithPath:appKilledPath];
-
-
-//hook springboard and declare functionality of the "applicationDidFinishLaunching:(id)application" function
 %hook SpringBoard
 
 //play sound when respring
 - (void)applicationDidFinishLaunching:(id)application {
 
-        player = [[AVAudioPlayer alloc] initWithContentsOfURL:startUpURL error:nil];
-        player.numberOfLoops = 0;
-        player.volume = 1;
-                
-        [player play];
-
 %orig;
+SystemSoundID sound = 0;
+AudioServicesDisposeSystemSoundID(sound);
+AudioServicesCreateSystemSoundID((CFURLRef) CFBridgingRetain([NSURL fileURLWithPath:@"/Library/Application Support/Animezing/respring.caf"]), &sound);
+AudioServicesPlaySystemSound((SystemSoundID)sound);
+}
+
+%end
+
+%hook SBCoverSheetPrimarySlidingViewController
+
+//play sound when unlocked
+- (void)viewWillDisappear:(BOOL)arg1 {
+
+    %orig;
+    SystemSoundID sound = 0;
+    AudioServicesDisposeSystemSoundID(sound);
+    AudioServicesCreateSystemSoundID((CFURLRef) CFBridgingRetain([NSURL fileURLWithPath:@"/Library/Application Support/Animezing/unlock.caf"]), &sound);
+		AudioServicesPlaySystemSound((SystemSoundID)sound);
 
 }
 
 %end
 
-//hook sbuicontroller and declare new functionalities of the "playConnectedToPowerSoundIfNecessary" function
+//play sound when locked
+%hook SBSleepWakeHardwareButtonInteraction
+
+- (void)_playLockSound {
+
+    SystemSoundID sound = 0;
+    AudioServicesDisposeSystemSoundID(sound);
+    AudioServicesCreateSystemSoundID((CFURLRef) CFBridgingRetain([NSURL fileURLWithPath:@"/Library/Application Support/Animezing/lock.caf"]), &sound);
+    AudioServicesPlaySystemSound((SystemSoundID)sound);
+
+}
+
+%end
+
 %hook SBUIController
+
 -(void)playConnectedToPowerSoundIfNecessary {
 
     //if device gets connected to charger play sound
 	if (self.isOnAC) {
 		nil;
 
-        player = [[AVAudioPlayer alloc] initWithContentsOfURL:chargingURL error:nil];
-        player.numberOfLoops = 0;
-        player.volume = 1;
-                
-        [player play];
+    %orig;
+    SystemSoundID sound = 0;
+    AudioServicesDisposeSystemSoundID(sound);
+    AudioServicesCreateSystemSoundID((CFURLRef) CFBridgingRetain([NSURL fileURLWithPath:@"/Library/Application Support/Animezing/pluggedIn.caf"]), &sound);
+		AudioServicesPlaySystemSound((SystemSoundID)sound);
 	
     //if device is not connected to charger or is getting uplugged from the charger play sound
-	} else if (self.isOnAC == false) {
+	} else if (!(self.isOnAC)) {
 
-        player = [[AVAudioPlayer alloc] initWithContentsOfURL:unpluggedURL error:nil];
-        player.numberOfLoops = 0;
-        player.volume = 1;
-                
-        [player play];
 
-    } else {
-        %orig;
+    %orig;
+    SystemSoundID sound = 0;
+    AudioServicesDisposeSystemSoundID(sound);
+    AudioServicesCreateSystemSoundID((CFURLRef) CFBridgingRetain([NSURL fileURLWithPath:@"/Library/Application Support/Animezing/unplugged.caf"]), &sound);
+		AudioServicesPlaySystemSound((SystemSoundID)sound);
     }
-
-    //if device is fully charged (100%) play sound
-    if (self.isFullyCharged == true) {
-
-        player = [[AVAudioPlayer alloc] initWithContentsOfURL:fullyChargedURL error:nil];
-        player.numberOfLoops = 0;
-        player.volume = 1;
-                
-        [player play];
-
-    } else {
-        %orig;
-    }
-
 }
 
 %end
 
-//hook SBMainDisplaySceneManager and declare new functionalities of the "_appKilledInAppSwitcher:(id)arg1" function
 %hook SBMainDisplaySceneManager
 
 //if any app gets killed play sound
 -(void)_appKilledInAppSwitcher:(id)arg1 {
 
-        player = [[AVAudioPlayer alloc] initWithContentsOfURL:appKilledURL error:nil];
-        player.numberOfLoops = 0;
-        player.volume = 1;
-                
-        [player play];
-
-%orig;
+    %orig;
+    SystemSoundID sound = 0;
+    AudioServicesDisposeSystemSoundID(sound);
+    AudioServicesCreateSystemSoundID((CFURLRef) CFBridgingRetain([NSURL fileURLWithPath:@"/Library/Application Support/Animezing/appKilled.caf"]), &sound);
+		AudioServicesPlaySystemSound((SystemSoundID)sound);
 
 }
 
